@@ -1,0 +1,43 @@
+---
+title: "Interactive Rio de Janeiro Health Map"
+author: "Alex Curtis"
+date: "July 7, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Mapping Health in Rio
+
+This is an interactive map displaying the health establishments in Rio de Janeiro. The data was made available at http://data.rio/, which is an open data portal created by the City of Rio de Janeiro. The original dataset was coded by many factors, including neighborhood. I used the neighborhood factor to iterate a series of individual neighborhood maps, also in R. The original report on this analysis can be found here:
+
+https://medium.com/@imcurtis/mapping-health-in-rio-de-janeiro-120d19d1b4e4
+
+I've plotted the geographic points that these establishments are located in, and provided a popup for each, including the following markers: Neighborhood, Establishment Name, Street, Phone and Establishment Type.
+
+```{r map}
+install.packages("leaflet", repos="http://cran.us.r-project.org")
+library(leaflet)
+library(htmlwidgets)
+
+health_small <- read.csv("health_small_1.csv")
+
+m <- leaflet(health_small) %>% setView(lng=-43.4303, lat=-22.8763, zoom = 10) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=-43.1729, lat=-22.9068, popup="Rio de Janeiro") %>%
+  addCircles(~lon, ~lat, popup=paste("Neighbohood:", health_small$Bairro, "<br>",
+                                     "Name:", health_small$NomeDeFantasia, "<br>",
+                                     "Street:", health_small$logradouro, "<br>",
+                                     "Phone:", health_small$Telefone, "<br>",
+                                     "Establishment Type:", health_small$TipoDeEstablecimento,"<br>"), 
+             weight=3, radius=40,
+             color="#FF4500", stroke = TRUE, fillOpacity = 0.8)
+  saveWidget(m, file="map1.html", selfcontained=FALSE)
+
+```
+## Map
+```{r}
+m  # Print the map
+```
